@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react'
-// weekStart now comes from props — no local state needed for week navigation
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { Booking, BlockedSlot, WaitlistEntry, Profile, BookingRules } from '../../types'
 import {
@@ -64,7 +63,7 @@ export function CalendarGrid({ bookings, blockedSlots, waitlist, profile, rules,
 
   function isPrimeHour(hour: number, day: Date): boolean {
     if (rules.prime_weekdays_only) {
-      const dow = day.getDay()
+      const dow = day.getUTCDay()   // day is a Panama Date object — use UTC fields
       if (dow === 0 || dow === 6) return false
     }
     return hour >= PRIME_START && hour < PRIME_END
@@ -96,7 +95,9 @@ export function CalendarGrid({ bookings, blockedSlots, waitlist, profile, rules,
             <tr>
               <th className="hour-col" />
               {days.map((day, i) => {
-                const isToday = day.toDateString() === today.toDateString()
+                const isToday = day.getUTCFullYear() === today.getUTCFullYear() &&
+                               day.getUTCMonth()    === today.getUTCMonth()    &&
+                               day.getUTCDate()     === today.getUTCDate()
                 return (
                   <th key={i} className={`day-col ${isToday ? 'today' : ''}`}>
                     {formatDayHeader(day)}

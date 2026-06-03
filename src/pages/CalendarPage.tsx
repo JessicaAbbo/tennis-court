@@ -3,7 +3,7 @@ import type { Profile } from '../types'
 import { useCalendar } from '../hooks/useCalendar'
 import { useSettings } from '../hooks/useSettings'
 import { CalendarGrid } from '../components/calendar/CalendarGrid'
-import { getWeekStart, localToday } from '../lib/dateUtils'
+import { getWeekStart, localToday, panamaMidnightUTC } from '../lib/dateUtils'
 import { BookingHistory } from '../components/admin/BookingHistory'
 
 interface Props { profile: Profile }
@@ -16,13 +16,8 @@ export function CalendarPage({ profile }: Props) {
   // CalendarPage (for data fetching) and CalendarGrid (for rendering)
   const [weekStart, setWeekStart] = useState(() => getWeekStart(today))
 
-  // Build the UTC ISO string that useCalendar uses as a query anchor.
-  // Panama midnight = 05:00 UTC
-  const weekStartISO = (() => {
-    const d = new Date(weekStart)
-    d.setHours(5, 0, 0, 0)
-    return d.toISOString()
-  })()
+  // Panama Monday midnight in UTC — anchor for useCalendar queries
+  const weekStartISO = panamaMidnightUTC(weekStart)
 
   const { bookings, blockedSlots, waitlist, loading, refetch } = useCalendar(weekStartISO)
 
